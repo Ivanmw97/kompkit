@@ -58,32 +58,54 @@ jobs:
   build-react-playground:
     name: Build React Playground
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: playground/react-example
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
-      - run: npm ci
-      - run: npm run build
+
+      - name: Install React Lib Dependencies
+        run: npm ci
+        working-directory: packages/react
+
+      - name: Build React Library
+        run: npm run build
+        working-directory: packages/react
+
+      - name: Install Playground Dependencies
+        run: npm ci
+        working-directory: playground/react-example
+
+      - name: Build Playground
+        run: npm run build
+        working-directory: playground/react-example
 
   build-vue-playground:
     name: Build Vue Playground
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: playground/vue-example
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
-      - run: npm ci
-      - run: npm run build
+
+      - name: Install Vue Lib Dependencies
+        run: npm ci
+        working-directory: packages/vue
+
+      - name: Build Vue Library
+        run: npm run build
+        working-directory: packages/vue
+
+      - name: Install Playground Dependencies
+        run: npm ci
+        working-directory: playground/vue-example
+
+      - name: Build Playground
+        run: npm run build
+        working-directory: playground/vue-example
 
   build-android-playground:
     name: Build Android Playground
