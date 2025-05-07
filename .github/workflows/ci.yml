@@ -2,25 +2,103 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main, develop]
 
 jobs:
-  build:
+  build-react-lib:
+    name: Build React Library
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-
+    defaults:
+      run:
+        working-directory: packages/react
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test --if-present
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present
+
+  build-vue-lib:
+    name: Build Vue Library
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/vue
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present
+
+  build-android-lib:
+    name: Build Android Library
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/android
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Grant Gradle permission
+        run: chmod +x ./gradlew || true
+      - name: Build with Gradle
+        run: ./gradlew build
+
+  build-react-playground:
+    name: Build React Playground
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: playground/react-example
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
+  build-vue-playground:
+    name: Build Vue Playground
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: playground/vue-example
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
+  build-android-playground:
+    name: Build Android Playground
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: playground/android-example
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Grant Gradle permission
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
+        run: ./gradlew build

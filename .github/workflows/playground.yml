@@ -1,0 +1,66 @@
+name: Deploy Playground
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'playground/**'
+
+jobs:
+  deploy-vue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      - run: npm ci
+        working-directory: playground/vue-example
+      - run: npm run build
+        working-directory: playground/vue-example
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: playground/vue-example/dist
+          destination_dir: vue
+          persist-credentials: false
+          clean: true
+
+  deploy-react:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+      - run: npm ci
+        working-directory: playground/react-example
+      - run: npm run build
+        working-directory: playground/react-example
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: playground/react-example/dist
+          destination_dir: react
+          persist-credentials: false
+          clean: true
+
+  deploy-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build APK
+        run: ./gradlew assembleDebug
+        working-directory: playground/android-example
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-playground-debug
+          path: playground/android-example/app/build/outputs/apk/debug/app-debug.apk
