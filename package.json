@@ -1,0 +1,22 @@
+{
+  "name": "kompkit",
+  "version": "0.1.0",
+  "description": "A comprehensive component library for multiple frameworks (Vue, React, Android)",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "components",
+    "ui",
+    "vue",
+    "react",
+    "android"
+  ],
+  "author": "",
+  "license": "MIT"
+}
