@@ -51,7 +51,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
       - name: Grant Gradle permission
-        run: chmod +x ./gradlew || true
+        run: chmod +x ../../gradlew
       - name: Build with Gradle
         run: ../../gradlew assembleRelease
 
@@ -99,6 +99,6 @@ jobs:
           distribution: 'temurin'
           java-version: 17
       - name: Grant Gradle permission
-        run: chmod +x ./gradlew
+        run: chmod +x ../../gradlew
       - name: Build with Gradle
-        run: ../../gradlew assembleRelease
+        run: ../../gradlew assembleDebug
