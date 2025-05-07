@@ -5,10 +5,12 @@
   "main": "index.js",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "playground/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:playground": "cd playground && npm run dev:react && npm run dev:vue"
   },
   "keywords": [
     "components",
@@ -17,6 +19,6 @@
     "react",
     "android"
   ],
-  "author": "",
+  "author": "Ivan Mendez Westlund",
   "license": "MIT"
 }
