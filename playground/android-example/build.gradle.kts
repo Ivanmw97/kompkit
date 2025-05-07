@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "ivan.kompkit.playground"
-    compileSdk = 31
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "ivan.kompkit.playground"
         minSdk = 21
-        targetSdk = 31
+        targetSdk = 33
         versionCode = 1
         versionName = "0.1.0"
     }
@@ -20,7 +20,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.1"
+        kotlinCompilerExtensionVersion = "1.4.7"
     }
 
     kotlinOptions {
