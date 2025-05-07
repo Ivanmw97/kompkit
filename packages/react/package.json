@@ -1,18 +1,15 @@
 {
   "name": "@kompkit/react",
   "version": "0.1.0",
-  "description": "React component library for KompKit",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": ["dist"],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "type-check": "tsc --noEmit",
     "lint": "echo \"No linting yet\""
   },
-  "files": [
-    "dist"
-  ],
   "publishConfig": {
     "access": "public"
   },
@@ -22,9 +19,7 @@
   },
   "devDependencies": {
     "vite": "^5.0.0",
-    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react-swc": "^3.4.0",
     "typescript": "^5.0.0"
-  },
-  "author": "Iván Méndez Westlund",
-  "license": "MIT"
+  }
 }

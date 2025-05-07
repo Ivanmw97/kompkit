@@ -46,21 +46,21 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-android:
-  needs: release
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-    - name: Build AAR
-      run: ./gradlew assembleRelease
-      working-directory: packages/android
-    - name: Publish to GitHub Packages
-      run: ./gradlew publish
-      working-directory: packages/android
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        USERNAME: ${{ github.actor }}
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build AAR
+        run: ./gradlew assembleRelease
+        working-directory: packages/android
+      - name: Publish to GitHub Packages
+        run: ../../gradlew publish
+        working-directory: packages/android
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.actor }}
