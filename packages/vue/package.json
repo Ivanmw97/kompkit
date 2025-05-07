@@ -2,10 +2,19 @@
   "name": "@kompkit/vue",
   "version": "0.1.0",
   "description": "Vue component library for KompKit",
-  "main": "./index.ts",
-  "types": "./index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "build": "vite build",
+    "type-check": "vue-tsc --noEmit",
+    "lint": "echo \"No linting yet\""
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "vue": "^3.2.0"

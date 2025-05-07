@@ -9,8 +9,9 @@
     "playground/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:playground": "cd playground && npm run dev:react && npm run dev:vue"
+    "dev:react": "npm --workspace playground/react-example run dev",
+    "dev:vue": "npm --workspace playground/vue-example run dev",
+    "dev:playground": "npm run dev:react & npm run dev:vue"
   },
   "keywords": [
     "components",

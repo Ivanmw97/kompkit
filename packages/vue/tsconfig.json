@@ -1,20 +1,22 @@
 {
-    "compilerOptions": {
-      "declaration": true,
-      "declarationDir": "dist",
-      "emitDeclarationOnly": true,
-      "outDir": "dist",
-      "baseUrl": ".",
-      "paths": {
-        "@/*": ["./*"]
-      },
-      "module": "ESNext",
-      "target": "ESNext",
-      "moduleResolution": "Node",
-      "jsx": "preserve",
-      "esModuleInterop": true,
-      "skipLibCheck": true
-    },
-    "include": ["./index.ts", "./button/**/*.vue"]
-  }
-  
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "jsx": "preserve",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "dist",
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["index.ts", "button/**/*"],
+  "exclude": ["dist", "node_modules"]
+}
