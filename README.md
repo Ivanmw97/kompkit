@@ -16,14 +16,8 @@ KompKit is a versatile UI component library designed to work across multiple pla
 kompkit/
 ├── packages/
 │   ├── vue/            # Vue components
-│   │   ├── button/
-│   │   └── index.ts
 │   ├── react/          # React components
-│   │   ├── button/
-│   │   └── index.ts
 │   └── android/        # Android components
-│       ├── src/
-│       └── build.gradle
 ├── playground/         # Example applications
 │   ├── vue-example/    # Vue playground
 │   ├── react-example/  # React playground
