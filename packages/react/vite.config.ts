@@ -9,7 +9,7 @@ export default defineConfig({
       entry: path.resolve(__dirname, 'index.ts'),
       name: 'KompkitReact',
       fileName: 'index',
-      formats: ['es', 'cjs']
+      formats: ['es']
     },
     rollupOptions: {
       external: ['react', 'react-dom'],
