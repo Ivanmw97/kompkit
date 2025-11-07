@@ -25,6 +25,9 @@ jobs:
       
       - name: Build web package
         run: npm run build
+      
+      - name: Test web package
+        run: npm test
         
   build-android:
     name: Build Android Package
@@ -44,4 +47,8 @@ jobs:
       
       - name: Build Android package
         run: ./gradlew build
+        working-directory: packages/core/android
+      
+      - name: Test Android package
+        run: ./gradlew test
         working-directory: packages/core/android

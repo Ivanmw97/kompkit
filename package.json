@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "build": "lerna run build",
-    "test": "lerna run test"
+    "test:web": "lerna run test --scope=@kompkit/core",
+    "test:android": "cd packages/core/android && ./gradlew test",
+    "test": "npm run test:web && npm run test:android"
   },
   "keywords": [
     "utilities",
