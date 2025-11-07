@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.24"
+    id("org.jetbrains.dokka") version "1.9.20"
 }
 
 repositories {
@@ -27,4 +28,10 @@ dependencies {
 
 tasks.test {
     useJUnit()
+}
+
+tasks.register<Copy>("copyDokkaToDocs") {
+    dependsOn(tasks.named("dokkaHtml"))
+    from(layout.buildDirectory.dir("dokka/html"))
+    into(layout.projectDirectory.dir("../../docs/api/android"))
 }

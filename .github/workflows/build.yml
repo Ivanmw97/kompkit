@@ -28,6 +28,9 @@ jobs:
       
       - name: Test web package
         run: npm test
+      
+      - name: Generate web API docs
+        run: npm run docs:web
         
   build-android:
     name: Build Android Package
@@ -51,4 +54,8 @@ jobs:
       
       - name: Test Android package
         run: ./gradlew test
+        working-directory: packages/core/android
+      
+      - name: Generate Android API docs
+        run: ./gradlew copyDokkaToDocs
         working-directory: packages/core/android

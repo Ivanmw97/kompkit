@@ -7,9 +7,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup",
-    "test": "vitest run"
+    "test": "vitest run",
+    "docs": "typedoc"
   },
   "devDependencies": {
+    "typedoc": "^0.26.0",
     "vitest": "^1.6.0",
     "tsup": "^8.0.0",
     "typescript": "^5.6.0"

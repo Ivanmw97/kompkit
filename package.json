@@ -10,7 +10,10 @@
     "build": "lerna run build",
     "test:web": "lerna run test --scope=@kompkit/core",
     "test:android": "cd packages/core/android && ./gradlew test",
-    "test": "npm run test:web && npm run test:android"
+    "test": "npm run test:web && npm run test:android",
+    "docs:web": "npm --prefix packages/core/web run docs",
+    "docs:android": "cd packages/core/android && ./gradlew copyDokkaToDocs",
+    "docs:all": "npm run docs:web && npm run docs:android"
   },
   "keywords": [
     "utilities",
