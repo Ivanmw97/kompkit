@@ -1,53 +1,97 @@
 # KompKit
 
-A comprehensive component library for multiple frameworks (Vue, React, Android).
+A lightweight cross-platform utility kit for Android, React and Vue.
 
 ## Overview
 
-KompKit is a versatile UI component library designed to work across multiple platforms and frameworks. It provides consistent design and functionality across:
+KompKit provides essential utility functions that work seamlessly across web (TypeScript) and Android (Kotlin) platforms. The library includes three core utilities:
 
-- Vue.js
-- React
-- Android
+- **debounce** - Delay function execution until after a wait period
+- **isEmail** - Validate email addresses with regex
+- **formatCurrency** - Format numbers as currency with locale support
 
-## Project Structure
+## Installation
 
-```
-kompkit/
-├── packages/
-│   ├── vue/            # Vue components
-│   │   └── button/
-│   ├── react/          # React components
-│   │   └── button/
-│   └── android/        # Android components
-│       └── button/
-├── docs/               # Documentation
-├── .github/            # GitHub configuration
-│   └── workflows/      # CI/CD workflows
-├── README.md
-└── package.json
+### Web (React/Vue)
+
+```bash
+npm install @kompkit/core
 ```
 
-## Getting Started
+### Android
 
-### Prerequisites
+Add to your `build.gradle.kts`:
 
-- Node.js (v14 or higher)
-- npm or yarn
+```kotlin
+dependencies {
+    implementation(files("path/to/kompkit/packages/core/android"))
+}
+```
 
-### Installation
+## Usage
+
+### Web (TypeScript)
+
+```typescript
+import { debounce, isEmail, formatCurrency } from '@kompkit/core';
+
+// Debounce a search function
+const handleSearch = debounce((query: string) => {
+  console.log('Searching for:', query);
+}, 300);
+
+// Validate email
+const valid = isEmail('user@example.com'); // true
+
+// Format currency
+const price = formatCurrency(1234.56); // "1.234,56 €"
+const priceUSD = formatCurrency(1234.56, 'USD', 'en-US'); // "$1,234.56"
+```
+
+### Android (Kotlin)
+
+```kotlin
+import com.kompkit.core.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+
+// Debounce a search function
+val scope = CoroutineScope(Dispatchers.Main)
+val handleSearch = debounce<String>(300L, scope) { query ->
+    println("Searching for: $query")
+}
+
+// Validate email
+val valid = isEmail("user@example.com") // true
+
+// Format currency
+val price = formatCurrency(1234.56) // "1.234,56 €"
+val priceUSD = formatCurrency(1234.56, "USD", Locale.US) // "$1,234.56"
+```
+
+## Development
+
+This is a monorepo managed with Lerna and npm workspaces.
 
 ```bash
 # Install dependencies
 npm install
 
-# Or using yarn
-yarn install
+# Build all packages
+npm run build
+
+# Run tests
+npm run test
 ```
 
-## Development
+## Structure
 
-Each package can be developed independently. Navigate to the specific package directory and follow the package-specific instructions.
+```
+packages/
+├── core/
+│   ├── web/          # TypeScript utilities
+│   └── android/      # Kotlin utilities
+```
 
 ## License
 
