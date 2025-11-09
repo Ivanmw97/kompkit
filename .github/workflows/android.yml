@@ -1,4 +1,4 @@
-name: Android CI
+name: Kotlin CI
 
 on:
   push:
@@ -22,8 +22,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  android:
-    name: Android (lint+build+test+docs)
+  kotlin:
+    name: Kotlin (lint+build+test+docs)
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.head_commit.message, '[skip android]') }}
     
@@ -39,14 +39,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: |
-            platform-tools
-            platforms;android-34
-            build-tools;34.0.0
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4

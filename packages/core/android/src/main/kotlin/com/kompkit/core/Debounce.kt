@@ -1,6 +1,9 @@
 package com.kompkit.core
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Debounces consecutive calls and emits only the last one after [waitMs] milliseconds.
@@ -21,13 +24,18 @@ import kotlinx.coroutines.*
  * search("hello") // Will execute after 300ms if no other calls are made
  * ```
  */
-fun <T> debounce(waitMs: Long = 250L, scope: CoroutineScope, dest: (T) -> Unit): (T) -> Unit {
-    var job: Job? = null
-    return { param: T ->
-        job?.cancel()
-        job = scope.launch {
-            delay(waitMs)
-            dest(param)
-        }
-    }
+fun <T> debounce(
+  waitMs: Long = 250L,
+  scope: CoroutineScope,
+  dest: (T) -> Unit,
+): (T) -> Unit {
+  var job: Job? = null
+  return { param: T ->
+    job?.cancel()
+    job =
+      scope.launch {
+        delay(waitMs)
+        dest(param)
+      }
+  }
 }
