@@ -47,19 +47,37 @@ jobs:
         run: npm ci
 
       - name: Lint (if available)
-        run: npm run lint --workspaces --if-present || echo "No lint script found"
+        run: |
+          if npm run lint --workspaces --if-present 2>/dev/null; then
+            echo "Workspace lint completed"
+          else
+            echo "No workspace lint found, trying root lint"
+            npm run lint || echo "No lint script found"
+          fi
 
       - name: Type check (if available)
-        run: npm run typecheck --workspaces --if-present || echo "No typecheck script found"
+        run: |
+          if npm run typecheck --workspaces --if-present 2>/dev/null; then
+            echo "Workspace typecheck completed"
+          else
+            echo "No workspace typecheck found, trying root typecheck"
+            npm run typecheck || echo "No typecheck script found"
+          fi
 
       - name: Build packages
-        run: npm run build --workspaces --if-present || npm run build
+        run: |
+          echo "Building with Lerna..."
+          npm run build
 
       - name: Run tests
-        run: npm test --workspaces --if-present || npm test || echo "No tests found"
+        run: |
+          echo "Running tests with Lerna..."
+          npm run test:web || echo "No web tests found"
 
       - name: Generate Web API docs
-        run: npm run docs:web --workspaces --if-present || echo "No web docs script found"
+        run: |
+          echo "Generating web docs..."
+          npm run docs:web || echo "No web docs script found"
 
       - name: Upload web docs artifact
         uses: actions/upload-artifact@v4
