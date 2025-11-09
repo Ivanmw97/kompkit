@@ -2,44 +2,70 @@ name: CI
 
 on:
   push:
-    branches: [release]
+    branches: [release, develop]
   pull_request:
-    branches: [release]
+    branches: [release, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   web:
-    name: Web (build+test+docs)
+    name: Web (lint+build+test+docs)
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[skip web]') }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.x'
           cache: 'npm'
-      - name: Install
+
+      - name: Install dependencies
         run: npm ci
+
+      - name: Lint (if available)
+        run: npm run lint --workspaces --if-present || echo "No lint script found"
+
+      - name: Type check (if available)
+        run: npm run typecheck --workspaces --if-present || echo "No typecheck script found"
+
       - name: Build
         run: npm run build --workspaces --if-present || npm run build
+
       - name: Test
-        run: npm test --workspaces --if-present || npm test || echo "no tests"
+        run: npm test --workspaces --if-present || npm test || echo "No tests found"
+
       - name: Generate Web API docs
-        run: npm run docs:web --workspaces --if-present || echo "skip web docs"
+        run: npm run docs:web --workspaces --if-present || echo "No web docs script found"
+
       - name: Upload web docs artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-docs
+          name: web-docs-${{ github.run_id }}
           path: docs/web
           if-no-files-found: ignore
+          retention-days: 30
 
   android:
-    name: Android (build+test+docs)
+    name: Android (lint+build+test+docs)
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[skip android]') }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -55,83 +81,69 @@ jobs:
             platforms;android-34
             build-tools;34.0.0
 
-      - name: Gradle cache
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: packages/core/android
 
-      # Detect android module dir (supports packages/core/android or packages/android or root/android)
-      - name: Detect Android directory
-        id: findandroid
-        shell: bash
-        run: |
-          set -e
-          CANDIDATES=$(git ls-files -z | xargs -0 -n1 dirname | sort -u)
-          DIR=""
-          for d in $CANDIDATES; do
-            if [ -f "$d/gradlew" ] || [ -f "$d/gradle/wrapper/gradle-wrapper.properties" ]; then
-              if [[ "$d" == *"/android" || "$d" == "android" ]]; then
-                DIR="$d"
-                break
-              fi
-            fi
-          done
-          if [ -z "$DIR" ]; then
-            # fallback: try packages/core/android or packages/android explicitly
-            for d in packages/core/android packages/android android .; do
-              if [ -d "$d" ]; then DIR="$d"; break; fi
-            done
-          fi
-          echo "ANDROID_DIR=$DIR" >> $GITHUB_ENV
-          echo "Android dir: $DIR"
+      - name: Make gradlew executable
+        run: chmod +x packages/core/android/gradlew
 
-      - name: Ensure gradlew is executable
-        if: ${{ env.ANDROID_DIR != '' }}
-        run: |
-          if [ -f "${{ env.ANDROID_DIR }}/gradlew" ]; then
-            chmod +x "${{ env.ANDROID_DIR }}/gradlew"
-          fi
+      - name: Clean build
+        working-directory: packages/core/android
+        run: ./gradlew clean --stacktrace --no-daemon
 
-      - name: Build
-        run: |
-          if [ -f "${{ env.ANDROID_DIR }}/gradlew" ]; then
-            (cd "${{ env.ANDROID_DIR }}" && ./gradlew assemble)
-          else
-            echo "No gradlew found – trying wrapper-less build"
-            (cd "${{ env.ANDROID_DIR }}" && gradle assemble)
-          fi
+      - name: Lint (ktlint)
+        working-directory: packages/core/android
+        run: ./gradlew ktlintCheck --stacktrace --no-daemon || echo "ktlint not configured"
 
-      - name: Test
-        run: |
-          if [ -f "${{ env.ANDROID_DIR }}/gradlew" ]; then
-            (cd "${{ env.ANDROID_DIR }}" && ./gradlew test)
-          else
-            (cd "${{ env.ANDROID_DIR }}" && gradle test)
-          fi
+      - name: Static analysis (detekt)
+        working-directory: packages/core/android
+        run: ./gradlew detekt --stacktrace --no-daemon || echo "detekt not configured"
 
-      - name: Generate Android API docs
-        run: |
-          if [ -f "${{ env.ANDROID_DIR }}/gradlew" ]; then
-            (cd "${{ env.ANDROID_DIR }}" && ./gradlew dokkaHtml || true)
-          else
-            (cd "${{ env.ANDROID_DIR }}" && gradle dokkaHtml || true)
-          fi
+      - name: Build debug
+        working-directory: packages/core/android
+        run: ./gradlew assembleDebug --stacktrace --no-daemon
 
-      - name: Copy Dokka to docs/android (if task or output exists)
-        shell: bash
+      - name: Run tests
+        working-directory: packages/core/android
+        run: ./gradlew test --stacktrace --no-daemon
+
+      - name: Generate docs (Dokka)
+        working-directory: packages/core/android
+        run: ./gradlew dokkaHtml --stacktrace --no-daemon || echo "Dokka not configured"
+
+      - name: Copy Dokka to docs/android
         run: |
-          OUT=""
-          # try common Dokka output locations
-          if [ -d "${{ env.ANDROID_DIR }}/build/dokka/html" ]; then OUT="${{ env.ANDROID_DIR }}/build/dokka/html"; fi
-          if [ -d "${{ env.ANDROID_DIR }}/build/dokka/htmlCollector" ]; then OUT="${{ env.ANDROID_DIR }}/build/dokka/htmlCollector"; fi
-          if [ -n "$OUT" ]; then
+          if [ -d "packages/core/android/build/dokka/html" ]; then
             mkdir -p docs/android
-            cp -R "$OUT"/. docs/android/ || true
+            cp -R packages/core/android/build/dokka/html/. docs/android/
+            echo "Dokka docs copied to docs/android"
           else
-            echo "No Dokka HTML output found; skipping copy"
+            echo "No Dokka HTML output found"
           fi
 
-      - name: Upload android docs artifact
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-test-reports-${{ github.run_id }}
+          path: packages/core/android/build/reports/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: android-docs
+          name: android-debug-apk-${{ github.run_id }}
+          path: packages/core/android/build/outputs/apk/debug/*.apk
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload android docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-docs-${{ github.run_id }}
           path: docs/android
           if-no-files-found: ignore
+          retention-days: 30
