@@ -60,9 +60,9 @@ jobs:
         working-directory: packages/core/android
         run: ./gradlew detekt --stacktrace --no-daemon || echo "detekt not configured"
 
-      - name: Build debug
+      - name: Build JAR
         working-directory: packages/core/android
-        run: ./gradlew assembleDebug --stacktrace --no-daemon
+        run: ./gradlew assemble --stacktrace --no-daemon
 
       - name: Run unit tests
         working-directory: packages/core/android
@@ -72,12 +72,12 @@ jobs:
         working-directory: packages/core/android
         run: ./gradlew dokkaHtml --stacktrace --no-daemon || echo "Dokka not configured"
 
-      - name: Copy Dokka to docs/android
+      - name: Copy Dokka to docs/api/android
         run: |
           if [ -d "packages/core/android/build/dokka/html" ]; then
-            mkdir -p docs/android
-            cp -R packages/core/android/build/dokka/html/. docs/android/
-            echo "Dokka docs copied to docs/android"
+            mkdir -p docs/api/android
+            cp -R packages/core/android/build/dokka/html/. docs/api/android/
+            echo "Dokka docs copied to docs/api/android"
           else
             echo "No Dokka HTML output found"
           fi
@@ -102,18 +102,18 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Upload APK
+      - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
-          name: android-debug-apk-${{ github.run_id }}
-          path: packages/core/android/build/outputs/apk/debug/*.apk
+          name: kotlin-jar-${{ github.run_id }}
+          path: packages/core/android/build/libs/*.jar
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Upload android docs
+      - name: Upload kotlin docs
         uses: actions/upload-artifact@v4
         with:
-          name: android-docs-${{ github.run_id }}
-          path: docs/android
+          name: kotlin-docs-${{ github.run_id }}
+          path: docs/api/android
           if-no-files-found: ignore
           retention-days: 30
