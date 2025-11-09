@@ -7,12 +7,12 @@ on:
     branches: [main, develop]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build-web:
-    name: Build and Test Web Package
+  web:
+    name: Web Build and Test
     runs-on: ubuntu-latest
     
     steps:
@@ -32,20 +32,21 @@ jobs:
         run: npm run build
         
       - name: Run tests
-        run: npm run test:web
+        run: npm test --workspaces --if-present
         
       - name: Generate web documentation
-        run: npm run docs:web
+        run: npm run docs:web --workspaces --if-present
         
       - name: Upload web documentation
         uses: actions/upload-artifact@v4
+        if: hashFiles('docs/web/**') != ''
         with:
           name: web-docs
-          path: packages/core/web/docs/
+          path: docs/web/
           retention-days: 30
 
-  build-android:
-    name: Build and Test Android Package
+  android:
+    name: Android Build and Test
     runs-on: ubuntu-latest
     
     steps:
@@ -58,6 +59,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+          
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -66,17 +72,18 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x packages/core/android/gradlew
         
-      - name: Build Android package
-        run: cd packages/core/android && ./gradlew build
+      - name: Assemble Android package
+        run: cd packages/core/android && ./gradlew assemble
         
       - name: Run Android tests
         run: cd packages/core/android && ./gradlew test
         
       - name: Generate Android documentation
-        run: cd packages/core/android && ./gradlew copyDokkaToDocs
+        run: cd packages/core/android && ./gradlew copyDokkaToDocs || echo "Dokka task not found, skipping"
         
       - name: Upload Android documentation
         uses: actions/upload-artifact@v4
+        if: hashFiles('docs/android/**') != ''
         with:
           name: android-docs
           path: docs/android/

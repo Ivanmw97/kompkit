@@ -1,10 +1,10 @@
 {
   "name": "kompkit",
   "version": "0.1.0",
-  "description": "A lightweight cross-platform utility kit for Android, React and Vue",
+  "description": "A lightweight cross-platform utility kit for Android (Kotlin) and Web (TypeScript): debounce, isEmail, formatCurrency",
   "private": true,
   "workspaces": [
-    "packages/core/web"
+    "packages/*"
   ],
   "scripts": {
     "build": "lerna run build",

@@ -1,10 +1,11 @@
 # KompKit
 
+[![CI](https://github.com/Kompkit/KompKit/actions/workflows/ci.yml/badge.svg)](https://github.com/Kompkit/KompKit/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-0095D5?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
 
-A lightweight cross-platform utility kit for Android, React and Vue applications.
+A lightweight cross-platform utility kit for Android (Kotlin) and Web (TypeScript): debounce, isEmail, formatCurrency.
 
 ## Overview
 
@@ -48,7 +49,7 @@ dependencies {
 **Alternative:** Clone the repository and include the Android module directly:
 
 ```bash
-git clone https://github.com/yourusername/kompkit.git
+git clone https://github.com/Kompkit/KompKit.git
 # Add the module to your Android project
 ```
 
@@ -107,7 +108,7 @@ This is a monorepo managed with Lerna and npm workspaces.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/kompkit.git
+git clone https://github.com/Kompkit/KompKit.git
 cd kompkit
 
 # Install dependencies
@@ -228,5 +229,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - 📖 [Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/Ivanmw97/kompkit/issues)
-- 💬 [Discussions](https://github.com/Ivanmw97/kompkit/discussions)
+- 🐛 [Issue Tracker](https://github.com/Kompkit/KompKit/issues)
+- 💬 [Discussions](https://github.com/Kompkit/KompKit/discussions)
