@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-web:
+    name: Build and Test Web Package
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build packages
+        run: npm run build
+        
+      - name: Run tests
+        run: npm run test:web
+        
+      - name: Generate web documentation
+        run: npm run docs:web
+        
+      - name: Upload web documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-docs
+          path: packages/core/web/docs/
+          retention-days: 30
+
+  build-android:
+    name: Build and Test Android Package
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+          
+      - name: Make gradlew executable
+        run: chmod +x packages/core/android/gradlew
+        
+      - name: Build Android package
+        run: cd packages/core/android && ./gradlew build
+        
+      - name: Run Android tests
+        run: cd packages/core/android && ./gradlew test
+        
+      - name: Generate Android documentation
+        run: cd packages/core/android && ./gradlew copyDokkaToDocs
+        
+      - name: Upload Android documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-docs
+          path: docs/android/
+          retention-days: 30

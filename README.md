@@ -228,5 +228,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - 📖 [Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/yourusername/kompkit/issues)
-- 💬 [Discussions](https://github.com/yourusername/kompkit/discussions)
+- 🐛 [Issue Tracker](https://github.com/Ivanmw97/kompkit/issues)
+- 💬 [Discussions](https://github.com/Ivanmw97/kompkit/discussions)
