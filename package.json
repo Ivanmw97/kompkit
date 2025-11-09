@@ -26,6 +26,10 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "lerna": "^8.0.0"
+    "lerna": "^8.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.6.0",
+    "typedoc": "^0.28.14",
+    "vitest": "^1.6.0"
   }
 }
