@@ -4,18 +4,30 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    target-branch: "release"
     open-pull-requests-limit: 5
     groups:
       minor-and-patch:
         update-types:
           - minor
           - patch
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+
   - package-ecosystem: gradle
-    directory: "/packages/core/android"
+    directory: "/"
     schedule:
       interval: weekly
+    target-branch: "release"
+    open-pull-requests-limit: 5
     groups:
       minor-and-patch:
         update-types:
           - minor
           - patch
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
