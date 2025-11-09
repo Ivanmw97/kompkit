@@ -1,0 +1,8 @@
+{
+  "entryPoints": ["src/index.ts"],
+  "out": "../../../docs/api/web",
+  "plugin": [],
+  "tsconfig": "tsconfig.json",
+  "exclude": ["**/*.test.ts", "**/tests/**"],
+  "readme": "none"
+}

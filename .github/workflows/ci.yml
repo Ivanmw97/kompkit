@@ -6,121 +6,85 @@ on:
   pull_request:
     branches: [main, develop]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build-react-lib:
-    name: Build React Library
+  web:
+    name: Web Build and Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/react
+    
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '20'
           cache: 'npm'
-      - run: npm ci
-      - run: npm run build --if-present
-
-  build-vue-lib:
-    name: Build Vue Library
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/vue
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build packages
+        run: npm run build
+        
+      - name: Run tests
+        run: npm test --workspaces --if-present
+        
+      - name: Generate web documentation
+        run: npm run docs:web --workspaces --if-present
+        
+      - name: Upload web documentation
+        uses: actions/upload-artifact@v4
+        if: hashFiles('docs/web/**') != ''
         with:
-          node-version: 18
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build --if-present
+          name: web-docs
+          path: docs/web/
+          retention-days: 30
 
-  build-android-lib:
-    name: Build Android Library
+  android:
+    name: Android Build and Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/android
+    
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
+          java-version: '17'
           distribution: 'temurin'
-          java-version: 17
-      - name: Grant Gradle permission
-        run: chmod +x ../../gradlew
-      - name: Build with Gradle
-        run: ../../gradlew assembleRelease
-
-  build-react-playground:
-    name: Build React Playground
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+          
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
         with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: Install React Lib Dependencies
-        run: npm ci
-        working-directory: packages/react
-
-      - name: Build React Library
-        run: npm run build
-        working-directory: packages/react
-
-      - name: Install Playground Dependencies
-        run: npm ci
-        working-directory: playground/react-example
-
-      - name: Build Playground
-        run: npm run build
-        working-directory: playground/react-example
-
-  build-vue-playground:
-    name: Build Vue Playground
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+          
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: Install Vue Lib Dependencies
-        run: npm ci
-        working-directory: packages/vue
-
-      - name: Build Vue Library
-        run: npm run build
-        working-directory: packages/vue
-
-      - name: Install Playground Dependencies
-        run: npm ci
-        working-directory: playground/vue-example
-
-      - name: Build Playground
-        run: npm run build
-        working-directory: playground/vue-example
-
-  build-android-playground:
-    name: Build Android Playground
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: playground/android-example
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+          cache-read-only: false
+          
+      - name: Make gradlew executable
+        run: chmod +x packages/core/android/gradlew
+        
+      - name: Assemble Android package
+        run: cd packages/core/android && ./gradlew assemble
+        
+      - name: Run Android tests
+        run: cd packages/core/android && ./gradlew test
+        
+      - name: Generate Android documentation
+        run: cd packages/core/android && ./gradlew copyDokkaToDocs || echo "Dokka task not found, skipping"
+        
+      - name: Upload Android documentation
+        uses: actions/upload-artifact@v4
+        if: hashFiles('docs/android/**') != ''
         with:
-          distribution: 'temurin'
-          java-version: 17
-      - name: Grant Gradle permission
-        run: chmod +x ../../gradlew
-      - name: Build with Gradle
-        run: ../../gradlew assembleDebug
+          name: android-docs
+          path: docs/android/
+          retention-days: 30

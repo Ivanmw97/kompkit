@@ -1,116 +1,41 @@
-# Getting Started with KompKit
+# Getting started
 
-KompKit is a comprehensive component library that provides UI components for multiple frameworks including Vue, React, and Android. This guide will help you get started with using KompKit in your projects.
+KompKit Core is a small cross-platform utility library for Web (TypeScript) and Android (Kotlin).
 
-## Installation
+Status: `0.0.x-alpha`.
 
-KompKit is organized as a monorepo with separate packages for each framework. You can install the specific package you need for your project.
+## Install
 
-### Vue Components
-
+### Web (React/Vue)
 ```bash
-npm install @kompkit/vue
-# or
-yarn add @kompkit/vue
+npm i @kompkit/core
 ```
 
-### React Components
-
-```bash
-npm install @kompkit/react
-# or
-yarn add @kompkit/react
-```
-
-### Android Components
-
-For Android, add the dependency to your app's build.gradle file:
-
-```gradle
-implementation 'com.kompkit:android:0.1.0'
-```
-
-## Usage Examples
-
-### Vue Button Component
-
-```vue
-<template>
-  <div>
-    <KButton variant="primary">Primary Button</KButton>
-    <KButton variant="secondary">Secondary Button</KButton>
-    <KButton variant="outline">Outline Button</KButton>
-    <KButton variant="text">Text Button</KButton>
-  </div>
-</template>
-
-<script setup>
-import { KButton } from '@kompkit/vue';
-</script>
-```
-
-### React Button Component
-
-```jsx
-import React from 'react';
-import { Button } from '@kompkit/react';
-
-function App() {
-  return (
-    <div>
-      <Button variant="primary">Primary Button</Button>
-      <Button variant="secondary">Secondary Button</Button>
-      <Button variant="outline">Outline Button</Button>
-      <Button variant="text">Text Button</Button>
-    </div>
-  );
-}
-```
-
-### Android Button Component
-
+### Android (Gradle)
+Add the dependency to your module build file:
 ```kotlin
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import com.kompkit.android.button.KompButton
-import com.kompkit.android.button.KompButtonVariant
-
-@Composable
-fun ButtonsExample() {
-    KompButton(
-        text = "Primary Button",
-        onClick = { /* handle click */ },
-        variant = KompButtonVariant.PRIMARY
-    )
-    
-    KompButton(
-        text = "Secondary Button",
-        onClick = { /* handle click */ },
-        variant = KompButtonVariant.SECONDARY
-    )
-    
-    KompButton(
-        text = "Outline Button",
-        onClick = { /* handle click */ },
-        variant = KompButtonVariant.OUTLINE
-    )
-    
-    KompButton(
-        text = "Text Button",
-        onClick = { /* handle click */ },
-        variant = KompButtonVariant.TEXT
-    )
+dependencies {
+    implementation("com.kompkit:core:<version>")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 }
 ```
 
-## Customization
+## Build and test locally
+Run from the repository root:
+```bash
+# Build web package
+npm run build
 
-Each component can be customized through props/parameters. Refer to the specific component documentation for details on available customization options.
+# Run tests for web and android
+npm run test
+```
 
-## Contributing
+## Utilities
 
-Contributions are welcome! Please see our contributing guidelines for more information.
+| Utility          | Description                                      |
+|------------------|--------------------------------------------------|
+| `debounce`       | Debounce a function call by a delay.             |
+| `isEmail`        | Validate a string with a basic email regex.      |
+| `formatCurrency` | Format numbers into a localized currency string. |
 
-## License
-
-KompKit is licensed under the MIT License.
+Next: read the detailed guides for [Web](./web.md), [Android](./android.md), and the [Recipes](./recipes.md).
