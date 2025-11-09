@@ -1,0 +1,63 @@
+name: Auto-merge Dependabot
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  handle:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-merge minor/patch
+        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          merge-method: squash
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Label majors as blocked
+        if: steps.meta.outputs.update-type == 'version-update:semver-major'
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: "blocked: major, dependencies"
+
+      - name: Comment on majors
+        if: steps.meta.outputs.update-type == 'version-update:semver-major'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `
+            ⚠️ This is a **semver major** update detected by Dependabot.
+            We currently ignore majors to avoid breaking CI. 
+            Closing for now — open an issue to plan a coordinated upgrade (tooling & docs).
+            `;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body
+            });
+
+      - name: Close major PRs
+        if: steps.meta.outputs.update-type == 'version-update:semver-major'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              state: 'closed'
+            });
