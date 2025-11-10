@@ -1,73 +1,238 @@
-# Contributing
+# Contributing to KompKit
 
-Contributions to KompKit Core are welcome. Please follow these guidelines.
+We welcome contributions to KompKit! This document provides guidelines for contributing to our cross-platform utility library.
 
-## Commit conventions
+## Getting Started
 
-Use conventional commit messages:
-- `feat:` for new features
-- `fix:` for bug fixes
-- `chore:` for maintenance tasks
-- `docs:` for documentation updates
-- `test:` for test additions or updates
+### Prerequisites
 
-Example:
+- **Node.js** 20+ and npm
+- **JDK** 17+ (for Kotlin development)
+- **Git** for version control
+
+### Development Setup
+
+1. **Fork and clone the repository**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/KompKit.git
+   cd KompKit
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Create a feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+## Development Workflow
+
+### Branch Strategy
+
+- **`develop`**: Active development branch (target for PRs)
+- **`release`**: Stable release branch (production)
+- **Feature branches**: `feature/feature-name` or `fix/bug-name`
+
+### Commit Convention
+
+We use [Conventional Commits](https://www.conventionalcommits.org/) for consistent commit messages:
+
 ```
-feat(core): add throttle utility for web and android
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
 ```
 
-## Code guidelines
+**Types:**
+- `feat`: New features
+- `fix`: Bug fixes
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+- `ci`: CI/CD changes
 
-1. **Always add or update tests.** Every new utility or bug fix must include corresponding tests for both web (Vitest) and Android (JUnit).
-
-2. **Maintain Web/Android API parity.** Function signatures, parameters, and behavior should be consistent across platforms. If a feature cannot be implemented identically, document the differences clearly.
-
-3. **Keep dependencies minimal.** Avoid adding new runtime dependencies unless absolutely necessary.
-
-4. **Follow existing code style.** Use TypeScript for web, Kotlin for Android. Follow the patterns established in the existing codebase.
-
-## Local development
-
-### Setup
+**Examples:**
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/kompkit.git
-cd kompkit
-
-# Install dependencies
-npm install
+feat(web): add throttle utility function
+fix(kotlin): resolve debounce memory leak
+docs: update API reference for formatCurrency
+test(web): add edge cases for email validation
 ```
 
-### Build
+### Code Guidelines
+
+1. **Cross-platform API parity**: Maintain identical APIs across TypeScript and Kotlin implementations
+2. **Zero dependencies**: Avoid adding runtime dependencies unless absolutely necessary
+3. **Comprehensive testing**: Every feature must include tests for both platforms
+4. **Documentation**: Update API docs and examples for new features
+5. **Type safety**: Use TypeScript and Kotlin type systems effectively
+
+## Development Commands
+
+### Building
+
 ```bash
-# Build web package
+# Build all packages
 npm run build
+
+# Build web package only
+npm run docs:web
+
+# Build Kotlin package only
+cd packages/core/android && ./gradlew assemble
 ```
 
-### Test
+### Testing
+
 ```bash
-# Run all tests (web + android)
+# Run all tests
 npm test
 
-# Run only web tests
+# Run web tests only
 npm run test:web
 
-# Run only android tests
+# Run Kotlin tests only
 npm run test:android
 ```
 
-### Workflow
-1. Create a feature branch: `git checkout -b feat/my-feature`
-2. Make your changes
-3. Add tests for both platforms
-4. Run `npm test` to verify all tests pass
-5. Commit with a conventional commit message
-6. Push and open a pull request
+### Documentation
 
-## Pull request checklist
+```bash
+# Generate all documentation
+npm run docs:all
 
-- [ ] Tests added for web and android
-- [ ] All tests pass (`npm test`)
-- [ ] Code follows existing style
-- [ ] Commit messages follow conventions
-- [ ] Documentation updated if needed
+# Generate web docs (TypeDoc)
+npm run docs:web
+
+# Generate Kotlin docs (Dokka)
+npm run docs:android
+```
+
+### Code Quality
+
+```bash
+# Kotlin linting
+cd packages/core/android && ./gradlew ktlintCheck
+
+# Kotlin static analysis
+cd packages/core/android && ./gradlew detekt
+
+# Auto-fix Kotlin formatting
+cd packages/core/android && ./gradlew ktlintFormat
+```
+
+## Adding New Utilities
+
+When adding a new utility function:
+
+1. **Implement in both platforms**:
+   - TypeScript: `packages/core/web/src/`
+   - Kotlin: `packages/core/android/src/main/kotlin/com/kompkit/core/`
+
+2. **Maintain API consistency**:
+   ```typescript
+   // TypeScript
+   export function myUtility(param: string): boolean { ... }
+   ```
+   ```kotlin
+   // Kotlin
+   fun myUtility(param: String): Boolean { ... }
+   ```
+
+3. **Add comprehensive tests**:
+   - Web: `packages/core/web/tests/`
+   - Kotlin: `packages/core/android/src/test/kotlin/`
+
+4. **Update exports**:
+   - Add to `packages/core/web/src/index.ts`
+   - Kotlin exports are automatic via package structure
+
+5. **Document with examples**:
+   - Add JSDoc comments (TypeScript)
+   - Add KDoc comments (Kotlin)
+
+## Code Style
+
+### TypeScript
+- Use ESLint and Prettier configurations
+- Prefer `const` over `let`
+- Use explicit return types for public APIs
+- Follow existing naming conventions
+
+### Kotlin
+- Follow ktlint formatting rules
+- Use detekt for static analysis
+- Prefer `val` over `var`
+- Use explicit types for public APIs
+- Follow Kotlin coding conventions
+
+## Pull Request Process
+
+1. **Create a feature branch**:
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make your changes**:
+   - Implement feature in both platforms
+   - Add comprehensive tests
+   - Update documentation
+
+3. **Test thoroughly**:
+   ```bash
+   npm test
+   cd packages/core/android && ./gradlew test
+   ```
+
+4. **Commit with conventional messages**:
+   ```bash
+   git add .
+   git commit -m "feat(core): add new utility function"
+   ```
+
+5. **Push and create PR**:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+6. **PR targets `develop` branch**
+
+### PR Checklist
+
+- [ ] ✅ Feature implemented in both TypeScript and Kotlin
+- [ ] ✅ Tests added for both platforms with good coverage
+- [ ] ✅ All existing tests pass (`npm test`)
+- [ ] ✅ Code follows style guidelines (ktlint, ESLint)
+- [ ] ✅ API documentation updated (JSDoc/KDoc)
+- [ ] ✅ Conventional commit messages used
+- [ ] ✅ No breaking changes (or clearly documented)
+- [ ] ✅ PR description explains the change and motivation
+
+## Release Process
+
+Releases are managed by maintainers:
+
+1. **Version bump**: Update `package.json` and create `VERSION` file
+2. **Changelog**: Update `CHANGELOG.md` with new features/fixes
+3. **Tag creation**: Create and push version tag
+4. **Branch merge**: Merge `develop` → `release`
+
+## Getting Help
+
+- 📖 **Documentation**: [./docs/](../docs/)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/Kompkit/KompKit/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/Kompkit/KompKit/discussions)
+- 📧 **Maintainers**: Open an issue for direct contact
+
+## Code of Conduct
+
+This project follows the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/). Please be respectful and inclusive in all interactions.

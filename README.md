@@ -1,16 +1,28 @@
 # KompKit
 
+[![Version](https://img.shields.io/badge/version-0.1.0--alpha-orange.svg)](https://github.com/Kompkit/KompKit/releases)
 [![Web CI](https://github.com/Kompkit/KompKit/actions/workflows/web.yml/badge.svg?branch=develop)](https://github.com/Kompkit/KompKit/actions/workflows/web.yml)
 [![Kotlin CI](https://github.com/Kompkit/KompKit/actions/workflows/android.yml/badge.svg?branch=develop)](https://github.com/Kompkit/KompKit/actions/workflows/android.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-0095D5?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
 
-A lightweight cross-platform utility kit for Android (Kotlin) and Web (TypeScript): debounce, isEmail, formatCurrency.
+> **⚠️ Alpha Release**: This is an early alpha version. APIs may change before stable release.
+
+A lightweight cross-platform utility kit providing essential functions for Android (Kotlin) and Web (TypeScript) development. Built as a monorepo with identical APIs across platforms.
 
 ## Overview
 
 KompKit provides essential utility functions that work seamlessly across web (TypeScript) and Android (Kotlin) platforms. Built with developer experience in mind, it offers identical APIs across platforms while leveraging platform-specific optimizations.
+
+### Monorepo Structure
+
+| Module | Platform | Description | Status |
+|--------|----------|-------------|--------|
+| `packages/core/web` | TypeScript | Web utilities with Node.js support | ✅ Alpha |
+| `packages/core/android` | Kotlin JVM | Android utilities with coroutines | ✅ Alpha |
+| `docs/` | Documentation | API docs, guides, and examples | ✅ Alpha |
+| `.github/workflows/` | CI/CD | Automated testing and validation | ✅ Active |
 
 ### Core Utilities
 
@@ -23,205 +35,140 @@ KompKit provides essential utility functions that work seamlessly across web (Ty
 - ✅ **Cross-platform compatibility** - Identical APIs for web and Android
 - ✅ **TypeScript support** - Full type safety and IntelliSense
 - ✅ **Zero dependencies** - Lightweight with no external dependencies
-- ✅ **Comprehensive testing** - 100% test coverage
-- ✅ **Modern tooling** - Built with latest TypeScript and Kotlin standards
+- ✅ **Comprehensive testing** - 100% test coverage across platforms
+- ✅ **Modern tooling** - Built with latest TypeScript 5.6+ and Kotlin 2.1+
 - ✅ **Rich documentation** - Auto-generated API docs with examples
+- ✅ **CI/CD Ready** - Automated testing with GitHub Actions
 
-## Installation
-
-### Web (React/Vue)
-
-```bash
-npm install @kompkit/core
-```
-
-### Android
-
-Add to your `build.gradle.kts` (Module: app):
-
-```kotlin
-dependencies {
-    implementation(files("path/to/kompkit/packages/core/android"))
-    // Required for debounce functionality
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-}
-```
-
-**Alternative:** Clone the repository and include the Android module directly:
-
-```bash
-git clone https://github.com/Kompkit/KompKit.git
-# Add the module to your Android project
-```
-
-## Usage
-
-### Web (TypeScript)
-
-```typescript
-import { debounce, isEmail, formatCurrency } from '@kompkit/core';
-
-// Debounce a search function
-const handleSearch = debounce((query: string) => {
-  console.log('Searching for:', query);
-}, 300);
-
-// Validate email
-const valid = isEmail('user@example.com'); // true
-
-// Format currency
-const price = formatCurrency(1234.56); // "1.234,56 €"
-const priceUSD = formatCurrency(1234.56, 'USD', 'en-US'); // "$1,234.56"
-```
-
-### Android (Kotlin)
-
-```kotlin
-import com.kompkit.core.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-
-// Debounce a search function
-val scope = CoroutineScope(Dispatchers.Main)
-val handleSearch = debounce<String>(300L, scope) { query ->
-    println("Searching for: $query")
-}
-
-// Validate email
-val valid = isEmail("user@example.com") // true
-
-// Format currency
-val price = formatCurrency(1234.56) // "1.234,56 €"
-val priceUSD = formatCurrency(1234.56, "USD", Locale.US) // "$1,234.56"
-```
-
-## Development
-
-This is a monorepo managed with Lerna and npm workspaces.
+## Getting Started
 
 ### Prerequisites
 
-- **Node.js** 18+ and npm
-- **Java** 17+ (for Android development)
-- **Kotlin** 1.9+ (automatically managed by Gradle)
+- **Web**: Node.js 20+ and npm/yarn
+- **Android**: JDK 17+ and Kotlin 2.1+
 
-### Setup
+### Installation
+
+> **Note**: Alpha packages are not yet published to registries. Clone the repository for local development.
+
+#### Web Development
 
 ```bash
 # Clone the repository
 git clone https://github.com/Kompkit/KompKit.git
-cd kompkit
+cd KompKit
 
 # Install dependencies
 npm install
 
-# Build all packages
+# Build the web package
 npm run build
 
-# Run tests for both platforms
-npm run test
-
-# Run tests individually
-npm run test:web      # Web/TypeScript tests
-npm run test:android  # Android/Kotlin tests
+# Run tests
+npm run test:web
 ```
 
-### Documentation
-
-Generate documentation for both platforms:
+#### Android Development
 
 ```bash
-# Generate all documentation
-npm run docs:all
+# Clone the repository
+git clone https://github.com/Kompkit/KompKit.git
 
-# Generate web docs only (TypeDoc)
-npm run docs:web
+# Include in your Android project's settings.gradle.kts
+include(":kompkit-core")
+project(":kompkit-core").projectDir = file("path/to/KompKit/packages/core/android")
 
-# Generate Android docs only (Dokka)
-npm run docs:android
-
-# Serve documentation locally
-cd docs && python3 -m http.server 8080
-# Visit http://localhost:8080
+# Add to your app's build.gradle.kts
+dependencies {
+    implementation(project(":kompkit-core"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+}
 ```
 
-### Project Commands
+### Quick Start
 
-| Command | Description |
-|---------|-------------|
-| `npm run build` | Build all packages |
-| `npm run test` | Run all tests |
-| `npm run test:web` | Run web tests only |
-| `npm run test:android` | Run Android tests only |
-| `npm run docs:all` | Generate all documentation |
-| `npm run docs:web` | Generate web documentation |
-| `npm run docs:android` | Generate Android documentation |
+Once installed, you can import and use KompKit utilities:
+
+**TypeScript/JavaScript:**
+```typescript
+import { debounce, isEmail, formatCurrency } from '@kompkit/core';
+
+const search = debounce((query: string) => {
+  console.log('Searching:', query);
+}, 300);
+
+console.log(isEmail('user@example.com')); // true
+console.log(formatCurrency(1234.56)); // "1.234,56 €"
+```
+
+**Kotlin:**
+```kotlin
+import com.kompkit.core.*
+
+val search = debounce<String>(300L, scope) { query ->
+    println("Searching: $query")
+}
+
+println(isEmail("user@example.com")) // true
+println(formatCurrency(1234.56)) // "1.234,56 €"
+```
+
+## Documentation
+
+### 📚 Detailed Guides
+
+- **[Getting Started Guide](./docs/getting-started.md)** - Complete setup and first steps
+- **[API Reference](./docs/api/)** - Auto-generated API documentation
+  - [Web/TypeScript API](./docs/api/web/) - TypeDoc generated docs
+  - [Android/Kotlin API](./docs/api/android/) - Dokka generated docs
+- **[Architecture Overview](./docs/ARCHITECTURE.md)** - Monorepo structure and design
+- **[Contributing Guide](./docs/CONTRIBUTING.md)** - Development workflow and guidelines
+- **[CI/CD Documentation](./docs/README_CI.md)** - Build and deployment processes
+
+### 🔧 Development
+
+- **[Changelog](./docs/CHANGELOG.md)** - Version history and breaking changes
+- **[Roadmap](./docs/roadmap.md)** - Planned features and improvements
 
 ## Project Structure
 
 ```
-kompkit/
-├── packages/
-│   └── core/
-│       ├── web/                 # TypeScript/JavaScript package
-│       │   ├── src/            # Source files
-│       │   │   ├── debounce.ts
-│       │   │   ├── validate.ts
-│       │   │   ├── format.ts
-│       │   │   └── index.ts
-│       │   ├── tests/          # Test files
-│       │   ├── dist/           # Built output
-│       │   └── package.json
-│       └── android/            # Kotlin/Android package
-│           ├── src/
-│           │   ├── main/kotlin/com/kompkit/core/
-│           │   │   ├── Debounce.kt
-│           │   │   ├── Validate.kt
-│           │   │   └── Format.kt
-│           │   └── test/       # Test files
-│           └── build.gradle.kts
-├── docs/                       # Documentation
-│   ├── api/
-│   │   ├── web/               # TypeDoc generated docs
-│   │   └── android/           # Dokka generated docs
-│   ├── getting-started.md
-│   └── [other guides]
-├── LICENSE                     # MIT License
-├── README.md                   # This file
-├── package.json               # Root package configuration
-└── lerna.json                 # Lerna configuration
+KompKit/
+├── .github/workflows/          # CI/CD pipelines
+│   ├── web.yml                # Web package testing
+│   └── android.yml            # Kotlin package testing
+├── packages/core/
+│   ├── web/                   # TypeScript package
+│   │   ├── src/              # Source files
+│   │   ├── tests/            # Test files  
+│   │   └── package.json
+│   └── android/              # Kotlin JVM package
+│       ├── src/main/kotlin/  # Source files
+│       ├── src/test/kotlin/  # Test files
+│       └── build.gradle.kts
+├── docs/                     # Documentation
+│   ├── api/                  # Generated API docs
+│   └── *.md                  # Guides and references
+└── package.json             # Root configuration
 ```
 
-## API Reference
+## Version Information
 
-### debounce
+- **Current Version**: `0.1.0-alpha`
+- **Minimum Requirements**: 
+  - Node.js 20+ (Web)
+  - JDK 17+ (Android)
+  - TypeScript 5.6+
+  - Kotlin 2.1+
 
-**Web:** `debounce<T>(fn: T, wait?: number): T`  
-**Android:** `debounce<T>(waitMs: Long, scope: CoroutineScope, dest: (T) -> Unit): (T) -> Unit`
+## Contributing
 
-Delays function execution until after wait period has elapsed since the last time it was invoked.
+We welcome contributions! Please see our [Contributing Guide](./docs/CONTRIBUTING.md) for details on:
 
-### isEmail
-
-**Web:** `isEmail(v: string): boolean`  
-**Android:** `isEmail(value: String): Boolean`
-
-Validates whether a string matches a basic email pattern.
-
-### formatCurrency
-
-**Web:** `formatCurrency(amount: number, currency?: string, locale?: string): string`  
-**Android:** `formatCurrency(amount: Double, currency: String, locale: Locale): String`
-
-Formats a number as a localized currency string.
-
-## Roadmap
-
-- [ ] Add more utility functions (throttle, deepClone, etc.)
-- [ ] Support for React Native
-- [ ] iOS Swift implementation
-- [ ] Performance benchmarks
-- [ ] CI/CD pipeline setup
+- Development setup
+- Code style and conventions  
+- Testing requirements
+- Pull request process
 
 ## License
 
@@ -229,6 +176,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- 📖 [Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/Kompkit/KompKit/issues)
-- 💬 [Discussions](https://github.com/Kompkit/KompKit/discussions)
+- 📖 **Documentation**: [./docs/](./docs/)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/Kompkit/KompKit/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/Kompkit/KompKit/discussions)
+
+---
+
+> **Alpha Notice**: This project is in active development. APIs may change before the stable 1.0 release. We recommend pinning to specific versions in production applications.
+
