@@ -1,6 +1,6 @@
 {
   "name": "kompkit",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha",
   "description": "A lightweight cross-platform utility kit for Android (Kotlin) and Web (TypeScript): debounce, isEmail, formatCurrency",
   "private": true,
   "workspaces": [
