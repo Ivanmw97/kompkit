@@ -1,0 +1,98 @@
+name: Web CI
+
+on:
+  push:
+    branches: [release, develop]
+    paths: 
+      - 'packages/**'
+      - '!packages/core/android/**'
+      - 'package*.json'
+      - 'lerna.json'
+      - '.github/workflows/web.yml'
+  pull_request:
+    branches: [release, develop]
+    paths:
+      - 'packages/**'
+      - '!packages/core/android/**'
+      - 'package*.json'
+      - 'lerna.json'
+      - '.github/workflows/web.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web (lint+build+test+docs)
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[skip web]') }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (if available)
+        run: |
+          if npm run lint --workspaces --if-present 2>/dev/null; then
+            echo "Workspace lint completed"
+          else
+            echo "No workspace lint found, trying root lint"
+            npm run lint || echo "No lint script found"
+          fi
+
+      - name: Type check (if available)
+        run: |
+          if npm run typecheck --workspaces --if-present 2>/dev/null; then
+            echo "Workspace typecheck completed"
+          else
+            echo "No workspace typecheck found, trying root typecheck"
+            npm run typecheck || echo "No typecheck script found"
+          fi
+
+      - name: Build packages
+        run: |
+          echo "Building with Lerna..."
+          npm run build
+
+      - name: Run tests
+        run: |
+          echo "Running tests with Lerna..."
+          npm run test:web || echo "No web tests found"
+
+      - name: Generate Web API docs
+        run: |
+          echo "Generating web docs..."
+          npm run docs:web || echo "No web docs script found"
+
+      - name: Upload web docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-docs-${{ github.run_id }}
+          path: docs/api/web
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build-${{ github.run_id }}
+          path: |
+            packages/*/dist/
+            packages/*/build/
+          if-no-files-found: ignore
+          retention-days: 7

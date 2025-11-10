@@ -1,7 +1,8 @@
 package com.kompkit.core
 
 import java.text.NumberFormat
-import java.util.*
+import java.util.Currency
+import java.util.Locale
 
 /**
  * Formats a number as a localized currency string.
@@ -18,8 +19,12 @@ import java.util.*
  * formatCurrency(1000.0, "JPY", Locale.JAPAN) // "¥1,000"
  * ```
  */
-fun formatCurrency(amount: Double, currency: String = "EUR", locale: Locale = Locale("es", "ES")): String {
-    val nf = NumberFormat.getCurrencyInstance(locale)
-    nf.currency = Currency.getInstance(currency)
-    return nf.format(amount)
+fun formatCurrency(
+  amount: Double,
+  currency: String = "EUR",
+  locale: Locale = Locale("es", "ES"),
+): String {
+  val nf = NumberFormat.getCurrencyInstance(locale)
+  nf.currency = Currency.getInstance(currency)
+  return nf.format(amount)
 }

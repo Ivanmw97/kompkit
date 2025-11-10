@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
-    target-branch: "release"
+    target-branch: "develop"
     open-pull-requests-limit: 5
     groups:
       minor-and-patch:
@@ -20,7 +20,7 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
-    target-branch: "release"
+    target-branch: "develop"
     open-pull-requests-limit: 5
     groups:
       minor-and-patch:

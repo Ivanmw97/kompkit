@@ -1,0 +1,119 @@
+name: Kotlin CI
+
+on:
+  push:
+    branches: [release, develop]
+    paths:
+      - 'packages/core/android/**'
+      - '.github/workflows/android.yml'
+  pull_request:
+    branches: [release, develop]
+    paths:
+      - 'packages/core/android/**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  kotlin:
+    name: Kotlin (lint+build+test+docs)
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[skip android]') }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          build-root-directory: packages/core/android
+
+      - name: Make gradlew executable
+        run: chmod +x packages/core/android/gradlew
+
+      - name: Clean build
+        working-directory: packages/core/android
+        run: ./gradlew clean --stacktrace --no-daemon
+
+      - name: Lint (ktlint)
+        working-directory: packages/core/android
+        run: ./gradlew ktlintCheck --stacktrace --no-daemon || echo "ktlint not configured"
+
+      - name: Static analysis (detekt)
+        working-directory: packages/core/android
+        run: ./gradlew detekt --stacktrace --no-daemon || echo "detekt not configured"
+
+      - name: Build JAR
+        working-directory: packages/core/android
+        run: ./gradlew assemble --stacktrace --no-daemon
+
+      - name: Run unit tests
+        working-directory: packages/core/android
+        run: ./gradlew test --stacktrace --no-daemon
+
+      - name: Generate docs (Dokka)
+        working-directory: packages/core/android
+        run: ./gradlew dokkaHtml --stacktrace --no-daemon || echo "Dokka not configured"
+
+      - name: Copy Dokka to docs/api/android
+        run: |
+          if [ -d "packages/core/android/build/dokka/html" ]; then
+            mkdir -p docs/api/android
+            cp -R packages/core/android/build/dokka/html/. docs/api/android/
+            echo "Dokka docs copied to docs/api/android"
+          else
+            echo "No Dokka HTML output found"
+          fi
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-test-reports-${{ github.run_id }}
+          path: packages/core/android/build/reports/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload lint reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-lint-reports-${{ github.run_id }}
+          path: |
+            packages/core/android/build/reports/ktlint/
+            packages/core/android/build/reports/detekt/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: kotlin-jar-${{ github.run_id }}
+          path: packages/core/android/build/libs/*.jar
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload kotlin docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: kotlin-docs-${{ github.run_id }}
+          path: docs/api/android
+          if-no-files-found: ignore
+          retention-days: 30

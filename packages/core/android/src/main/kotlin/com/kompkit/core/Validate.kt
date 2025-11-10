@@ -1,5 +1,8 @@
 package com.kompkit.core
 
+/**
+ * KompKit Core - Android validation utilities
+ */
 private val EMAIL_RE = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
 
 /**
